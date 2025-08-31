@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../Dự án học html"
+		},
+		{
+			"path": "../Concert 2025"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Duanthuchanh-vidu"
+	}
+}
