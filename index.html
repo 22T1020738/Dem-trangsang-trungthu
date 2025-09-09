@@ -12,8 +12,8 @@
             font-family: 'Be Vietnam Pro', sans-serif;
             scroll-behavior: smooth;
             overflow-x: hidden;
-            background-color: #0f172a; /* Thêm màu nền tối cho toàn bộ body */
-            color: white; /* Màu chữ mặc định là trắng */
+            background-color: #0f172a;
+            color: white;
         }
 
         /* Hiệu ứng nền particles */
@@ -52,6 +52,18 @@
             50% { transform: scale(1.05); }
         }
 
+        /* Hiệu ứng scroll animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Áp dụng animation */
         .animate-float {
             animation: float 6s ease-in-out infinite;
@@ -71,6 +83,17 @@
 
         .animate-pulse {
             animation: pulse 2s infinite;
+        }
+
+        .animate-fadeInUp {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .animate-fadeInUp.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Hiệu ứng hover */
@@ -155,13 +178,62 @@
         .countup {
             transition: all 0.5s ease;
         }
+
+        /* Hiệu ứng parallax */
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(to right, #8b5cf6, #ec4899);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Hiệu ứng xuất hiện khi scroll */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .scroll-animate.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hiệu ứng cho navigation khi scroll */
+        nav.scrolled {
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
 <body class="bg-gray-900">
 
+  <!-- Progress bar -->
+  <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
   <!-- Navigation -->
-<nav class="fixed top-0 left-0 w-full z-50 bg-black/30 backdrop-blur-md text-white transition-all duration-300 hover:bg-black/40">
+<nav id="main-nav" class="fixed top-0 left-0 w-full z-50 text-white transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <div class="flex items-center space-x-2 animate-slideInLeft">
@@ -203,20 +275,18 @@
                     <span class="absolute bottom-0 left-0 w-full h-0.5 bg-purple-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                 </a>
                 
-                <a href="#sponsors" class="nav-link group relative px-3 py-2 font-medium transition">
-                    <span class="flex items-center">
-                        <i class="fas fa-hand-holding-usd mr-2 text-purple-300 opacity-0 group-hover:opacity-100 transition-all"></i>
-                        Nhà tài trợ
-                    </span>
+                
                     <span class="absolute bottom-0 left-0 w-full h-0.5 bg-purple-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                 </a>
             </div>
             
-            <button id="menu-btn" class="md:hidden text-white hover:text-purple-300 transition">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
+            <button id="menu-btn" class="md:hidden text-white hover:text-purple-300 transition flex flex-col items-center">
+    <svg id="menu-icon" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+    <span id="menu-text" class="text-xs">Menu</span>
+</button>
         </div>
     </div>
 
@@ -239,10 +309,7 @@
                 <i class="fas fa-ticket-alt mr-3 text-purple-300 w-5 text-center"></i>
                 Vé tham dự
             </a>
-            <a href="#sponsors" class="block px-3 py-3 text-white hover:bg-purple-900/30 rounded-md transition flex items-center">
-                <i class="fas fa-hand-holding-usd mr-3 text-purple-300 w-5 text-center"></i>
-                Nhà tài trợ
-            </a>
+            
         </div>
     </div>
 </nav>
@@ -255,7 +322,7 @@
     <!-- Video Background -->
     <div class="absolute inset-0 z-0 overflow-hidden">
         <video autoplay muted loop playsinline class="w-full h-full object-cover">
-            <source src="video nền.mp4" type="video/mp4">
+            <source src="video nền 1.mp4" type="video/mp4">
             <!-- Fallback image if video doesn't load -->
             <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27d1b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
                  alt="Background" 
@@ -270,10 +337,10 @@
     <div class="relative z-10 h-full flex items-center">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div class="flex flex-col md:flex-row items-center justify-between">
-          <div class="md:w-1/2 mb-10 md:mb-0 animate-slideInLeft">
-           <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
+          <div class="md:w-1/2 mb-5 md:mb-0 animate-slideInLeft">
+           <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-10 ">
            <span class="text-gradient">Đêm trăng sáng</span>
-            <p class="text-xl md:text-2xl mb-8 animate-fadeIn">Kết hợp giữa 3 câu lạc bộ: Khoa Học, Luật và Ngoại Ngữ</p>
+            <p class="text-sm md:text-xl mb-8 animate-fadeIn italic mt-2">" Phối hợp thực hiện bởi CLB Guitar trường Đại học Khoa Học, Đại học Luật và Đại học Ngoại Ngữ "</p>
             <a href="#tickets" class="inline-block bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-full font-bold text-lg transition duration-300 hover-grow shadow-lg">
               Đặt vé ngay <i class="fas fa-arrow-right ml-2 animate-pulse"></i>
             </a>
@@ -292,32 +359,32 @@
 <section class="relative py-12 -mt-20 z-10 moonlight-image-bg">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 animate-fadeIn">
-            <h2 class="text-3xl font-bold mb-4">Sự kiện bắt đầu sau</h2>
-            <div class="w-24 h-1 bg-purple-500 mx-auto mb-6"></div>
-            <p class="text-lg text-gray-300 max-w-xl mx-auto">Đêm nhạc sẽ diễn ra vào ngày 28/9/2025 tại Hội trường lớn - ĐH Luật</p>
+            <h2 class="text-3xl font-bold mb-4 scroll-animate">Sự kiện bắt đầu sau</h2>
+            <div class="w-24 h-1 bg-purple-500 mx-auto mb-6 scroll-animate"></div>
+            <p class="text-lg text-gray-300 max-w-xl mx-auto scroll-animate">Đêm nhạc sẽ diễn ra vào ngày 28/9/2025 tại Hội trường tầng 4, tòa Thư Viện - ĐH Ngoại Ngữ</p>
         </div>
         
         <div class="grid grid-cols-4 gap-4 md:gap-8">
             <!-- Ngày -->
-            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300">
+            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300 scroll-animate">
                 <div id="days" class="text-4xl md:text-5xl font-bold mb-2 text-purple-400 countup">00</div>
                 <div class="text-sm md:text-base uppercase tracking-wider text-gray-300">Ngày</div>
             </div>
             
             <!-- Giờ -->
-            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300">
+            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300 scroll-animate">
                 <div id="hours" class="text-4xl md:text-5xl font-bold mb-2 text-purple-400 countup">00</div>
                 <div class="text-sm md:text-base uppercase tracking-wider text-gray-300">Giờ</div>
             </div>
             
             <!-- Phút -->
-            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300">
+            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300 scroll-animate">
                 <div id="minutes" class="text-4xl md:text-5xl font-bold mb-2 text-purple-400 countup">00</div>
                 <div class="text-sm md:text-base uppercase tracking-wider text-gray-300">Phút</div>
             </div>
             
             <!-- Giây -->
-            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300">
+            <div class="countdown-item bg-gray-800/80 rounded-xl p-4 text-center backdrop-blur-sm hover-grow transition-all duration-300 scroll-animate">
                 <div id="seconds" class="text-4xl md:text-5xl font-bold mb-2 text-purple-400 countup">00</div>
                 <div class="text-sm md:text-base uppercase tracking-wider text-gray-300">Giây</div>
             </div>
@@ -325,7 +392,7 @@
         
         <!-- Nút đặt vé -->
         <div class="text-center mt-10 animate-fadeIn">
-            <a href="#tickets" class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full font-bold text-lg transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow">
+            <a href="#tickets" class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full font-bold text-lg transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow scroll-animate">
                 Đặt vé ngay <i class="fas fa-ticket-alt ml-2"></i>
             </a>
         </div>
@@ -342,16 +409,10 @@
         
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8 animate-slideInLeft">
-                <img src="mặt trăng 1.jpg" 
+                <img src="Ảnh concert.png" 
                      alt="Guitar Concert" 
                      class="rounded-lg shadow-xl w-full h-auto hover-grow transition-transform duration-500">
                 
-                <!-- Thêm hình ảnh thứ hai -->
-                <div class="mt-4">
-                    <img src="mặt trăng 2.jpg" 
-                         alt="Mô tả ảnh mới" 
-                         class="rounded-lg shadow-xl w-full h-auto hover-grow transition-transform duration-500">
-                </div>
             </div>
             <div class="md:w-1/2 animate-slideInRight">
                 <h3 class="text-2xl font-bold text-white mb-6">Thông tin chương trình</h3>
@@ -414,13 +475,13 @@
 <section id="clubs" class="py-16 moonlight-image-bg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fadeIn">Ba Câu Lạc Bộ Tham Gia</h2>
-            <div class="w-20 h-1 bg-purple-600 mx-auto animate-slideInRight"></div>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 scroll-animate">Sự kết hợp của 3 CLB</h2>
+            <div class="w-20 h-1 bg-purple-600 mx-auto scroll-animate"></div>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Science Club -->
-            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl animate-fadeIn" style="animation-delay: 0.1s;">
+            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl scroll-animate">
                 <div class="h-48 overflow-hidden">
                     <img src="logo khoa học.jpg" alt="Ảnh CLB" class="w-full h-full object-cover transition duration-500 hover:scale-110">
                 </div>
@@ -440,7 +501,7 @@
             </div>
             
             <!-- Law Club -->
-            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl animate-fadeIn" style="animation-delay: 0.2s;">
+            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl scroll-animate">
                 <div class="h-48 overflow-hidden">
                     <img src="logooluatj.jpg" alt="CLB Guitar Luật" class="w-full h-full object-cover transition duration-500 hover:scale-110">
                 </div>
@@ -461,7 +522,7 @@
             </div>
             
             <!-- Foreign Language Club -->
-            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl animate-fadeIn" style="animation-delay: 0.3s;">
+            <div class="club-card bg-gray-800/50 rounded-lg shadow-md overflow-hidden transition duration-500 hover:shadow-xl scroll-animate">
                 <div class="h-48 overflow-hidden">
                     <img src="Logo nn.jpg" 
                          alt="CLB Guitar Ngoại Ngữ" 
@@ -472,8 +533,8 @@
                     <p class="text-gray-300 mb-4">Với sự đa dạng về văn hóa, CLB Guitar Ngoại Ngữ mang đến những giai điệu từ khắp nơi trên thế giới, tạo nên một không gian âm nhạc đa sắc màu.</p>
                     <div class="flex items-center text-blue-400 hover:text-blue-300 transition">
                         <i class="fab fa-facebook mr-2"></i>
-                        <a href="https://www.facebook.com/clbguitarhuflis" target="_blank" class="hover:underline">
-                            https://www.facebook.com/clbguitarhuflis
+                        <a href="https://www.facebook.com/clbgitarhuflis" target="_blank" class="hover:underline">
+                            https://www.facebook.com/clbgitarhuflis
                         </a>
                     </div>
                 </div>
@@ -486,39 +547,39 @@
 <section id="charity" class="py-16 moonlight-image-bg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fadeIn">Hình thức gây quỹ</h2>
-            <div class="w-20 h-1 bg-purple-600 mx-auto animate-slideInLeft"></div>
-            <p class="text-gray-300 max-w-3xl mx-auto mt-4 animate-fadeIn">Để thực hiện chương trình "Concert thiện nguyện: Đêm Trăng Sáng" và các hoạt động thiện nguyện đi kèm, Ban tổ chức sẽ huy động kinh phí từ các nguồn sau</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 scroll-animate">Hình thức gây quỹ</h2>
+            <div class="w-20 h-1 bg-purple-600 mx-auto scroll-animate"></div>
+            <p class="text-gray-300 max-w-3xl mx-auto mt-4 scroll-animate">Để thực hiện chương trình "Concert thiện nguyện: Đêm Trăng Sáng" và các hoạt động thiện nguyện đi kèm, Ban tổ chức sẽ huy động kinh phí từ các nguồn sau</p>
         </div>
 
         <div class="flex flex-col md:flex-row items-center gap-8">
-            <div class="md:w-1/2 animate-slideInLeft">
+            <div class="md:w-1/2">
                 <img src="ảnh trường quảng an.jpg" 
                      alt="Trẻ em mồ côi" 
-                          class="w-full h-full object-cover object-center mb-6 rounded-lg">
+                          class="w-full h-full object-cover object-center mb-6 rounded-lg scroll-animate">
                           
 
           <img src="ảnh trẻ em 1.jpg" 
      alt="Hoạt động thiện nguyện" 
-     class="rounded-lg shadow-xl w-full h-[600px] md:h-[500px] object-cover hover-grow transition-transform duration-100">
+     class="rounded-lg shadow-xl w-full h-[600px] md:h-[500px] object-cover hover-grow transition-transform duration-100 scroll-animate">
 
         </div>
-            <div class="md:w-1/2 animate-slideInRight">
-                <h3 class="text-2xl font-bold text-white mb-4">Bán vé đêm nhạc</h3>
-                <p class="text-gray-300 mb-4">- Bán vé là hình thức gây quỹ chính, vừa giúp kiểm soát số lượng người tham dự, vừa tạo nguồn tài chính cho hoạt động thiện nguyện.</p>
-                <p class="text-gray-300 mb-6">- Giá vé: 20.000 VNĐ</p>
-                <p class="text-gray-300 mb-6">- Cách thức mua vé: Nhấn vào nút Đặt vé ngay hoặc mua trực tiếp tại các trường </p>
-                <p class="text-2xl font-bold text-white mb-4">Tài trợ từ doanh nghiệp và đơn vị đồng hành</p>
-                <p class="text-gray-300 mb-6">- Tài trợ tiền mặt nhằm hỗ trợ kinh phí tổ chức chương trình</p>
-                <p class="text-gray-300 mb-6">- Tài trợ hiện vật như bánh kẹo, quà tặng, lồng đèn, đồ chơi và các vật phẩm dành cho trẻ em, mang đến niềm vui và không khí ấm áp trong dịp lễ.</p>
-                <p class="text-gray-300 mb-6">- Hỗ trợ kỹ thuật và truyền thông, bao gồm âm thanh, ánh sáng, in ấn ấn phẩm, ghi hình, chụp ảnh và lan tỏa chương trình đến cộng đồng ...</p>
+            <div class="md:w-1/2">
+                <h3 class="text-2xl font-bold text-white mb-4 scroll-animate">Bán vé đêm nhạc</h3>
+                <p class="text-gray-300 mb-4 scroll-animate">- Bán vé là hình thức gây quỹ chính, vừa giúp kiểm soát số lượng người tham dự, vừa tạo nguồn tài chính cho hoạt động thiện nguyện.</p>
+                <p class="text-gray-300 mb-6 scroll-animate">- Giá vé: 20.000 VNĐ</p>
+                <p class="text-gray-300 mb-6 scroll-animate">- Cách thức mua vé: Nhấn vào nút Đặt vé ngay hoặc mua trực tiếp tại các trường </p>
+                <p class="text-2xl font-bold text-white mb-4 scroll-animate">Tài trợ từ doanh nghiệp và đơn vị đồng hành</p>
+                <p class="text-gray-300 mb-6 scroll-animate">- Tài trợ tiền mặt nhằm hỗ trợ kinh phí tổ chức chương trình</p>
+                <p class="text-gray-300 mb-6 scroll-animate">- Tài trợ hiện vật như bánh kẹo, quà tặng, lồng đèn, đồ chơi và các vật phẩm dành cho trẻ em, mang đến niềm vui và không khí ấm áp trong dịp lễ.</p>
+                <p class="text-gray-300 mb-6 scroll-animate">- Hỗ trợ kỹ thuật và truyền thông, bao gồm âm thanh, ánh sáng, in ấn ấn phẩm, ghi hình, chụp ảnh và lan tỏa chương trình đến cộng đồng ...</p>
                 <!-- Thêm phần này - bao gồm link ảnh QR code -->
-    <div class="flex items-start mb-6">
+    <div class="flex items-start mb-6 scroll-animate">
         <div class="flex-1">
             <p class="text-2xl font-bold text-white mb-4">Mọi sự đóng góp xin gửi về:</p>
-            <p class="text-gray-300 mb-2">- Số tài khoản:... </p>
-            <p class="text-gray-300 mb-2">- Tên tài khoản:... </p>
-            <p class="text-gray-300 mb-2">- Ngân hàng:...</p>
+            <p class="text-gray-300 mb-2">- Số tài khoản: 103876987132 </p>
+            <p class="text-gray-300 mb-2">- Tên tài khoản: TRINH THANH THU </p>
+            <p class="text-gray-300 mb-2">- Ngân hàng: VietinBank</p>
             <p class="text-gray-300">- Nội dung chuyển khoản: Ủng hộ đêm nhạc thiện nguyện "Đêm trăng sáng"</p>
         </div>
         <!-- Thêm ảnh QR code hoặc ảnh nhỏ bên cạnh -->
@@ -531,24 +592,24 @@
         </div>
     </div>
 
-    <div class="bg-purple-900/30 rounded-lg p-6 border border-purple-700 hover-grow transition-all">
+    <div class="bg-purple-900/30 rounded-lg p-6 border border-purple-700 hover-grow transition-all scroll-animate">
 
                 <div class="bg-purple-900/30 rounded-lg p-6 border border-purple-700 hover-grow transition-all">
-                    <h4 class="font-bold text-purple-400 mb-3">Số tiền quyên góp sẽ được sử dụng để:</h4>
+                    <h4 class="font-bold text-purple-400 mb-3 scroll-animate">Số tiền quyên góp sẽ được sử dụng để:</h4>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="flex items-start hover:text-purple-400 transition">
+                        <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                             <i class="fas fa-check text-purple-400 mt-1 mr-3"></i>
                             <span>Mua quà Trung thu và tổ chức các hoạt động cho trẻ em tại Trường Tiểu học số 2 – Quảng An.</span>
                         </li>
-                        <li class="flex items-start hover:text-purple-400 transition">
+                        <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                             <i class="fas fa-check text-purple-400 mt-1 mr-3"></i>
                             <span>Mua quần áo, vật dụng cá nhân thiết yếu</span>
                         </li>
-                        <li class="flex items-start hover:text-purple-400 transition">
+                        <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                             <i class="fas fa-check text-purple-400 mt-1 mr-3"></i>
                             <span>Tổ chức các hoạt động vui chơi, giải trí lành mạnh</span>
                         </li>
-                        <li class="flex items-start hover:text-purple-400 transition">
+                        <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                             <i class="fas fa-check text-purple-400 mt-1 mr-3"></i>
                             <span>Hỗ trợ chi phí học tập, sách vở, đồ dùng học sinh ....</span>
                         </li>
@@ -564,15 +625,15 @@
 <section id="tickets" class="py-16 moonlight-image-bg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fadeIn">Vé Tham Dự</h2>
-            <div class="w-20 h-1 bg-purple-600 mx-auto animate-slideInRight"></div>
-            <p class="text-gray-300 max-w-2xl mx-auto mt-4 animate-fadeIn">Chúng tôi chỉ cung cấp một loại vé duy nhất với mức giá hợp lý và nhiều ưu đãi hấp dẫn.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 scroll-animate">Vé Tham Dự</h2>
+            <div class="w-20 h-1 bg-purple-600 mx-auto scroll-animate"></div>
+            <p class="text-gray-300 max-w-2xl mx-auto mt-4 scroll-animate">Chúng tôi chỉ cung cấp một loại vé duy nhất với mức giá hợp lý và nhiều ưu đãi hấp dẫn.</p>
         </div>
         
         <!-- Grid Layout -->
-        <div class="grid md:grid-cols-2 gap-12 items-center animate-fadeIn">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
             <!-- Hình ảnh vé -->
-            <div class="flex justify-center transform hover:-translate-y-2 transition duration-300">
+            <div class="flex justify-center transform hover:-translate-y-2 transition duration-300 scroll-animate">
                 <div class="relative max-w-md">
                     <img src="ảnh vé đêm nhạc.jpg" 
                          alt="Mẫu vé Đêm trăng sáng" 
@@ -583,813 +644,72 @@
             
             <!-- Content Column -->
             <div class="text-center md:text-left space-y-6">
-                <h3 class="text-2xl font-bold text-white">Vé Đặc Biệt</h3>
-                <div class="text-purple-300 text-lg mb-4">
-                    <span class="text-4xl font-bold text-white">35.000đ</span>
-                    <span class="text-gray-400 line-through ml-2">50.000đ</span>
+                <h3 class="text-2xl font-bold text-white scroll-animate">Vé tham dự</h3>
+                <div class="text-purple-300 text-lg mb-4 scroll-animate">
+                    <span class="text-4xl font-bold text-white">20.000đ</span>
+                    <span class="text-gray-400 line-through ml-2">30.000đ</span>
                 </div>
                 <ul class="space-y-3 text-gray-300 text-left max-w-md mx-auto md:mx-0">
-                    <li class="flex items-start">
+                    <li class="flex items-start scroll-animate">
                         <i class="fas fa-check-circle text-purple-400 mt-1 mr-2"></i>
                         <span>Vé vào cửa duy nhất cho tất cả các tiết mục</span>
                     </li>
-                    <li class="flex items-start">
+                    <li class="flex items-start scroll-animate">
                         <i class="fas fa-check-circle text-purple-400 mt-1 mr-2"></i>
-                        <span>Tự do chọn chỗ ngồi theo sơ đồ</span>
+                        <span>Chỗ ngồi của bạn theo số ghế đã ghi trên vé</span>
                     </li>
-                    <li class="flex items-start">
+                    <li class="flex items-start scroll-animate">
                         <i class="fas fa-check-circle text-purple-400 mt-1 mr-2"></i>
-                        <span>Tặng kèm bộ quà lưu niệm</span>
+                        <span>Vòng tay sự kiện</span>
                     </li>
                 </ul>
                 
                 <!-- Nút mua vé -->
-                <div class="pt-4">
-                    <button id="open-booking-btn"
+                <div class="pt-4 scroll-animate">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScZZMGdK3tiXUU_wRXdDwX7qffa3eIVRZ8tiZmNXXhPCgZFHw/viewform" target="_blank"
                        class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-purple-500/40 inline-flex items-center transform hover:scale-105">
                         <i class="fas fa-ticket-alt mr-3"></i> Đặt vé ngay
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- Booking Modal -->
-<div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-gray-800 rounded-lg p-6 max-w-4xl w-full mx-4 animate-fadeIn overflow-y-auto max-h-screen">
-        <div class="flex justify-between items-center mb-6 sticky top-0 bg-gray-800 py-4">
-            <h3 class="text-2xl font-bold text-white">Đặt vé tham dự</h3>
-            <button id="close-booking-modal" class="text-gray-300 hover:text-white transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        
-        <!-- Booking Steps -->
-        <div class="mb-8">
-            <div class="flex justify-between mb-4">
-                <div class="step flex-1 text-center relative">
-                    <div class="step-number w-10 h-10 mx-auto rounded-full bg-purple-600 text-white flex items-center justify-center font-bold mb-2">1</div>
-                    <div class="step-title text-sm font-medium text-white">Thông tin</div>
-                    <div class="absolute top-5 left-1/2 w-full h-1 bg-gray-600 -z-10"></div>
-                </div>
-                <div class="step flex-1 text-center relative">
-                    <div class="step-number w-10 h-10 mx-auto rounded-full bg-gray-600 text-white flex items-center justify-center font-bold mb-2">2</div>
-                    <div class="step-title text-sm font-medium text-gray-400">Chọn ghế</div>
-                    <div class="absolute top-5 left-1/2 w-full h-1 bg-gray-600 -z-10"></div>
-                </div>
-                <div class="step flex-1 text-center">
-                    <div class="step-number w-10 h-10 mx-auto rounded-full bg-gray-600 text-white flex items-center justify-center font-bold mb-2">3</div>
-                    <div class="step-title text-sm font-medium text-gray-400">Thanh toán</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Step 1: Personal Information -->
-        <div id="step-1" class="step-content">
-            <form id="booking-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="fullname" class="block text-gray-300 font-medium mb-2">Họ và tên *</label>
-                        <input type="text" id="fullname" class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition" required>
-                    </div>
-                    
-                    <div>
-                        <label for="phone" class="block text-gray-300 font-medium mb-2">Số điện thoại *</label>
-                        <input type="tel" id="phone" class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition" required>
-                    </div>
-                </div>
-                
-                <div>
-                    <label for="email" class="block text-gray-300 font-medium mb-2">Email *</label>
-                    <input type="email" id="email" class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition" required>
-                </div>
-                
-                <div>
-                    <label for="quantity" class="block text-gray-300 font-medium mb-2">Số lượng vé *</label>
-                    <select id="quantity" class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition" required>
-                        <option value="" disabled selected>Chọn số lượng vé</option>
-                        <option value="1">1 vé</option>
-                        <option value="2">2 vé</option>
-                        <option value="3">3 vé</option>
-                        <option value="4">4 vé</option>
-                        <option value="5">5 vé</option>
-                    </select>
-                </div>
-                
-                <div class="pt-4 flex justify-end">
-                    <button type="button" id="next-to-seats" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow">
-                        Tiếp tục <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Step 2: Seat Selection -->
-        <div id="step-2" class="step-content hidden">
-            <div class="mb-6">
-                <h4 class="text-lg font-bold text-white mb-2">Chọn ghế của bạn</h4>
-                <p class="text-gray-400 text-sm">Chọn <span id="selected-seats-count">0</span>/<span id="max-seats">0</span> ghế</p>
-            </div>
-            
-            <!-- Screen -->
-            <div class="mb-8 text-center">
-                <div class="bg-purple-900/50 text-white py-2 mx-auto max-w-md rounded">
-                    <i class="fas fa-film mr-2"></i> SÂN KHẤU
-                </div>
-            </div>
-            
-            <!-- Seat Map -->
-            <div class="seat-map-container overflow-x-auto">
-                <div class="seat-map mx-auto" style="width: fit-content;">
-                    <!-- Rows will be generated by JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Seat Legend -->
-            <div class="flex justify-center mt-6 space-x-4">
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-gray-600 rounded-sm mr-2"></div>
-                    <span class="text-gray-400 text-sm">Ghế trống</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-purple-600 rounded-sm mr-2"></div>
-                    <span class="text-gray-400 text-sm">Đã chọn</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-gray-800 rounded-sm mr-2 border border-gray-600"></div>
-                    <span class="text-gray-400 text-sm">Đã bán</span>
-                </div>
-            </div>
-            
-            <!-- Selected Seats Info -->
-            <div id="selected-seats-info" class="mt-6 p-4 bg-gray-700/50 rounded-lg hidden">
-                <h5 class="font-medium text-white mb-2">Ghế đã chọn:</h5>
-                <div id="selected-seats-list" class="text-purple-300"></div>
-                <div class="mt-2 text-white">
-                    Tổng cộng: <span id="total-price" class="font-bold">0</span> VNĐ
-                </div>
-            </div>
-            
-            <div class="pt-6 flex justify-between">
-                <button type="button" id="back-to-info" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-gray-500/30 hover-grow">
-                    <i class="fas fa-arrow-left mr-2"></i> Quay lại
-                </button>
-                <button type="button" id="next-to-payment" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    Thanh toán <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Step 3: Payment -->
-        <div id="step-3" class="step-content hidden">
-            <div class="mb-6">
-                <h4 class="text-lg font-bold text-white mb-2">Thông tin thanh toán</h4>
-                <p class="text-gray-400">Vui lòng kiểm tra kỹ thông tin trước khi thanh toán</p>
-            </div>
-            
-            <div class="bg-gray-700/50 rounded-lg p-4 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <h5 class="font-medium text-white mb-1">Thông tin khách hàng</h5>
-                        <div id="payment-customer-info" class="text-gray-300"></div>
-                    </div>
-                    <div>
-                        <h5 class="font-medium text-white mb-1">Thông tin vé</h5>
-                        <div id="payment-ticket-info" class="text-gray-300"></div>
-                    </div>
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-gray-600">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white font-medium">Tổng thanh toán:</span>
-                        <span id="payment-total" class="text-2xl font-bold text-purple-400">0 VNĐ</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mb-6">
-                <h5 class="font-medium text-white mb-3">Phương thức thanh toán</h5>
-                <div class="grid grid-cols-2 gap-3">
-                    <label class="payment-method bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition border border-transparent hover:border-purple-500">
-                        <input type="radio" name="payment-method" value="banking" class="hidden" checked>
-                        <div class="flex items-center">
-                            <div class="w-6 h-6 rounded-full border-2 border-purple-500 flex items-center justify-center mr-3">
-                                <div class="w-3 h-3 rounded-full bg-purple-500"></div>
-                            </div>
-                            <div>
-                                <div class="font-medium text-white">Chuyển khoản ngân hàng</div>
-                                <div class="text-gray-400 text-sm">Thanh toán qua Internet Banking</div>
-                            </div>
-                        </div>
-                    </label>
-                    <label class="payment-method bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition border border-transparent hover:border-purple-500">
-                        <input type="radio" name="payment-method" value="momo" class="hidden">
-                        <div class="flex items-center">
-                            <div class="w-6 h-6 rounded-full border-2 border-gray-500 flex items-center justify-center mr-3">
-                                <div class="w-3 h-3 rounded-full bg-transparent"></div>
-                            </div>
-                            <div>
-                                <div class="font-medium text-white">Ví điện tử MoMo</div>
-                                <div class="text-gray-400 text-sm">Thanh toán qua ứng dụng MoMo</div>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Bank Transfer Info (shown when selected) -->
-            <div id="bank-transfer-info" class="bg-gray-700/30 rounded-lg p-4 mb-6">
-                <h5 class="font-medium text-white mb-3">Thông tin chuyển khoản</h5>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-gray-400 mb-1">Ngân hàng: <span class="text-white">Vietcombank</span></p>
-                        <p class="text-gray-400 mb-1">Số tài khoản: <span class="text-white">0123456789</span></p>
-                        <p class="text-gray-400 mb-1">Chủ tài khoản: <span class="text-white">CLB GUITAR LUẬT</span></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-400 mb-1">Số tiền: <span id="bank-amount" class="text-white font-bold">35,000 VNĐ</span></p>
-                        <p class="text-gray-400 mb-1">Nội dung: <span class="text-white">GUITAR_[SỐ ĐIỆN THOẠI]</span></p>
-                        <p class="text-sm text-purple-400">Ví dụ: GUITAR_0912345678</p>
-                    </div>
-                </div>
-                <div class="mt-4 flex items-center">
-                    <img src="qr.jpg" alt="QR Code" class="w-24 h-24 border border-purple-500 rounded-lg mr-4">
-                    <div class="text-sm text-gray-400">
-                        <p>Quét mã QR để thanh toán nhanh</p>
-                        <p>Sau khi chuyển khoản, vé sẽ được gửi qua email trong vòng 15 phút.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- MoMo Info (hidden by default) -->
-            <div id="momo-info" class="bg-gray-700/30 rounded-lg p-4 mb-6 hidden">
-                <div class="flex items-center">
-                    <img src="https://via.placeholder.com/100x100?text=MoMo" alt="MoMo QR" class="w-32 h-32 border border-pink-500 rounded-lg mr-4">
-                    <div>
-                        <p class="text-white mb-2">Quét mã QR để thanh toán qua MoMo</p>
-                        <p class="text-gray-400 text-sm">Hoặc chuyển khoản đến số điện thoại: <span class="text-white">0912 345 678</span></p>
-                        <p class="text-gray-400 text-sm">Nội dung: <span class="text-white">dem trang sang</span></p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="pt-4 flex justify-between">
-                <button type="button" id="back-to-seats" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-gray-500/30 hover-grow">
-                    <i class="fas fa-arrow-left mr-2"></i> Quay lại
-                </button>
-                <button type="button" id="confirm-payment" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow">
-                    Xác nhận thanh toán <i class="fas fa-check-circle ml-2"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Success Message (hidden by default) -->
-        <div id="success-message" class="text-center py-10 hidden">
-            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-check text-4xl text-green-500"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-white mb-2">Đặt vé thành công!</h3>
-            <p class="text-gray-300 mb-6">Vé của bạn đã được đặt thành công. Chúng tôi đã gửi thông tin vé đến email của bạn.</p>
-            <button id="close-success" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg hover:shadow-purple-500/30 hover-grow">
-                Đóng <i class="fas fa-times ml-2"></i>
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Confirm Payment
-confirmPaymentBtn.addEventListener('click', function() {
-    // Get form data
-    const bookingData = {
-        'họ và tên': document.getElementById('fullname').value,
-        'số điện thoại': document.getElementById('phone').value,
-        'email': document.getElementById('email').value,
-        'số lượng vé': document.getElementById('quantity').value,
-        'ghế đã chọn': selectedSeats.join(', ')
-    };
-
-    // Send data to Google Sheet
-    fetch('YOUR_WEB_APP_URL', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData)
-    })
-    .then(() => {
-        // Show success message
-        step3.classList.add('hidden');
-        successMessage.classList.remove('hidden');
-        
-        // Update step indicators
-        document.querySelectorAll('.step-number')[2].classList.remove('bg-purple-600');
-        document.querySelectorAll('.step-number')[2].classList.add('bg-green-500');
-        document.querySelectorAll('.step-title')[2].classList.remove('text-white');
-        document.querySelectorAll('.step-title')[2].classList.add('text-green-400');
-        
-        console.log('Booking data saved to Google Sheet:', bookingData);
-    })
-    .catch(error => {
-        console.error('Error saving booking:', error);
-        alert('Có lỗi xảy ra khi lưu thông tin đặt vé. Vui lòng thử lại hoặc liên hệ ban tổ chức.');
-    });
-});
-</script>
-
-<script>
-    // Booking System
-    document.addEventListener('DOMContentLoaded', function() {
-        // Modal Elements
-        const bookingModal = document.getElementById('booking-modal');
-        const openBookingBtn = document.getElementById('open-booking-btn');
-        const closeBookingBtn = document.getElementById('close-booking-modal');
-        
-        // Step Elements
-        const step1 = document.getElementById('step-1');
-        const step2 = document.getElementById('step-2');
-        const step3 = document.getElementById('step-3');
-        const successMessage = document.getElementById('success-message');
-        
-        // Navigation Buttons
-        const nextToSeatsBtn = document.getElementById('next-to-seats');
-        const backToInfoBtn = document.getElementById('back-to-info');
-        const nextToPaymentBtn = document.getElementById('next-to-payment');
-        const backToSeatsBtn = document.getElementById('back-to-seats');
-        const confirmPaymentBtn = document.getElementById('confirm-payment');
-        const closeSuccessBtn = document.getElementById('close-success');
-        
-        // Form Elements
-        const bookingForm = document.getElementById('booking-form');
-        const seatMap = document.querySelector('.seat-map');
-        const selectedSeatsInfo = document.getElementById('selected-seats-info');
-        const selectedSeatsList = document.getElementById('selected-seats-list');
-        const selectedSeatsCount = document.getElementById('selected-seats-count');
-        const maxSeats = document.getElementById('max-seats');
-        const totalPrice = document.getElementById('total-price');
-        const paymentCustomerInfo = document.getElementById('payment-customer-info');
-        const paymentTicketInfo = document.getElementById('payment-ticket-info');
-        const paymentTotal = document.getElementById('payment-total');
-        const bankAmount = document.getElementById('bank-amount');
-        
-        // Payment Method Toggle
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const bankTransferInfo = document.getElementById('bank-transfer-info');
-        const momoInfo = document.getElementById('momo-info');
-        
-        // Variables
-        let selectedSeats = [];
-        const seatPrice = 35000;
-        const bookedSeats = ['A1', 'A2', 'B5', 'C3', 'D7']; // Example of already booked seats
-        
-        // Open Modal
-        openBookingBtn.addEventListener('click', function() {
-            bookingModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        // Close Modal
-        closeBookingBtn.addEventListener('click', closeModal);
-        closeSuccessBtn.addEventListener('click', closeModal);
-        
-        function closeModal() {
-            bookingModal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            resetForm();
-        }
-        
-        // Click outside to close
-        bookingModal.addEventListener('click', function(e) {
-            if (e.target === bookingModal) {
-                closeModal();
-            }
-        });
-        
-        // Reset form
-        function resetForm() {
-            bookingForm.reset();
-            selectedSeats = [];
-            updateSelectedSeats();
-            
-            // Reset steps
-            step1.classList.remove('hidden');
-            step2.classList.add('hidden');
-            step3.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            
-            // Reset step indicators
-            document.querySelectorAll('.step-number').forEach((el, index) => {
-                if (index === 0) {
-                    el.classList.remove('bg-gray-600');
-                    el.classList.add('bg-purple-600');
-                } else {
-                    el.classList.remove('bg-purple-600');
-                    el.classList.add('bg-gray-600');
-                }
-            });
-            
-            document.querySelectorAll('.step-title').forEach((el, index) => {
-                if (index === 0) {
-                    el.classList.remove('text-gray-400');
-                    el.classList.add('text-white');
-                } else {
-                    el.classList.remove('text-white');
-                    el.classList.add('text-gray-400');
-                }
-            });
-        }
-        
-        // Next to Step 2 (Seat Selection)
-        nextToSeatsBtn.addEventListener('click', function() {
-            if (bookingForm.checkValidity()) {
-                const quantity = parseInt(document.getElementById('quantity').value);
-                maxSeats.textContent = quantity;
-                
-                // Generate seat map
-                generateSeatMap(quantity);
-                
-                // Update step UI
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                
-                // Update step indicators
-                document.querySelectorAll('.step-number')[0].classList.remove('bg-purple-600');
-                document.querySelectorAll('.step-number')[0].classList.add('bg-green-500');
-                document.querySelectorAll('.step-number')[1].classList.remove('bg-gray-600');
-                document.querySelectorAll('.step-number')[1].classList.add('bg-purple-600');
-                
-                document.querySelectorAll('.step-title')[0].classList.remove('text-white');
-                document.querySelectorAll('.step-title')[0].classList.add('text-green-400');
-                document.querySelectorAll('.step-title')[1].classList.remove('text-gray-400');
-                document.querySelectorAll('.step-title')[1].classList.add('text-white');
-            } else {
-                bookingForm.reportValidity();
-            }
-        });
-        
-        // Back to Step 1 (Info)
-        backToInfoBtn.addEventListener('click', function() {
-            step2.classList.add('hidden');
-            step1.classList.remove('hidden');
-            
-            // Update step indicators
-            document.querySelectorAll('.step-number')[1].classList.remove('bg-purple-600');
-            document.querySelectorAll('.step-number')[1].classList.add('bg-gray-600');
-            document.querySelectorAll('.step-number')[0].classList.remove('bg-green-500');
-            document.querySelectorAll('.step-number')[0].classList.add('bg-purple-600');
-            
-            document.querySelectorAll('.step-title')[1].classList.remove('text-white');
-            document.querySelectorAll('.step-title')[1].classList.add('text-gray-400');
-            document.querySelectorAll('.step-title')[0].classList.remove('text-green-400');
-            document.querySelectorAll('.step-title')[0].classList.add('text-white');
-        });
-        
-        // Next to Step 3 (Payment)
-        nextToPaymentBtn.addEventListener('click', function() {
-            // Update payment info
-            const fullname = document.getElementById('fullname').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const quantity = document.getElementById('quantity').value;
-            
-            paymentCustomerInfo.innerHTML = `
-                <p>${fullname}</p>
-                <p>${phone}</p>
-                <p>${email}</p>
-            `;
-            
-            paymentTicketInfo.innerHTML = `
-                <p>Số lượng: ${quantity} vé</p>
-                <p>Ghế: ${selectedSeats.join(', ')}</p>
-                <p>Đơn giá: ${seatPrice.toLocaleString()} VNĐ/vé</p>
-            `;
-            
-            const total = selectedSeats.length * seatPrice;
-            paymentTotal.textContent = `${total.toLocaleString()} VNĐ`;
-            bankAmount.textContent = `${total.toLocaleString()} VNĐ`;
-            
-            // Update step UI
-            step2.classList.add('hidden');
-            step3.classList.remove('hidden');
-            
-            // Update step indicators
-            document.querySelectorAll('.step-number')[1].classList.remove('bg-purple-600');
-            document.querySelectorAll('.step-number')[1].classList.add('bg-green-500');
-            document.querySelectorAll('.step-number')[2].classList.remove('bg-gray-600');
-            document.querySelectorAll('.step-number')[2].classList.add('bg-purple-600');
-            
-            document.querySelectorAll('.step-title')[1].classList.remove('text-white');
-            document.querySelectorAll('.step-title')[1].classList.add('text-green-400');
-            document.querySelectorAll('.step-title')[2].classList.remove('text-gray-400');
-            document.querySelectorAll('.step-title')[2].classList.add('text-white');
-        });
-        
-        // Back to Step 2 (Seat Selection)
-        backToSeatsBtn.addEventListener('click', function() {
-            step3.classList.add('hidden');
-            step2.classList.remove('hidden');
-            
-            // Update step indicators
-            document.querySelectorAll('.step-number')[2].classList.remove('bg-purple-600');
-            document.querySelectorAll('.step-number')[2].classList.add('bg-gray-600');
-            document.querySelectorAll('.step-number')[1].classList.remove('bg-green-500');
-            document.querySelectorAll('.step-number')[1].classList.add('bg-purple-600');
-            
-            document.querySelectorAll('.step-title')[2].classList.remove('text-white');
-            document.querySelectorAll('.step-title')[2].classList.add('text-gray-400');
-            document.querySelectorAll('.step-title')[1].classList.remove('text-green-400');
-            document.querySelectorAll('.step-title')[1].classList.add('text-white');
-        });
-        
-        // Confirm Payment
-        confirmPaymentBtn.addEventListener('click', function() {
-            // Here you would normally send the data to your server
-            // For demo, we'll just show success message
-            
-            step3.classList.add('hidden');
-            successMessage.classList.remove('hidden');
-            
-            // Update step indicators
-            document.querySelectorAll('.step-number')[2].classList.remove('bg-purple-600');
-            document.querySelectorAll('.step-number')[2].classList.add('bg-green-500');
-            document.querySelectorAll('.step-title')[2].classList.remove('text-white');
-            document.querySelectorAll('.step-title')[2].classList.add('text-green-400');
-            
-            // In a real app, you would send the booking data to your server here
-            const bookingData = {
-                name: document.getElementById('fullname').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                quantity: document.getElementById('quantity').value,
-                seats: selectedSeats,
-                total: selectedSeats.length * seatPrice,
-                paymentMethod: document.querySelector('input[name="payment-method"]:checked').value
-            };
-            
-            console.log('Booking data:', bookingData);
-            
-            // Send email confirmation (this would be done on the server side)
-            // simulateEmailConfirmation(bookingData);
-        });
-        
-        // Payment Method Selection
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', function() {
-                // Update UI
-                paymentMethods.forEach(m => {
-                    const radio = m.querySelector('input');
-                    const circle = m.querySelector('.w-6.h-6 div');
-                    
-                    if (m === method) {
-                        m.querySelector('.w-6.h-6').classList.add('border-purple-500');
-                        m.querySelector('.w-6.h-6').classList.remove('border-gray-500');
-                        circle.classList.add('bg-purple-500');
-                        circle.classList.remove('bg-transparent');
-                        radio.checked = true;
-                    } else {
-                        m.querySelector('.w-6.h-6').classList.remove('border-purple-500');
-                        m.querySelector('.w-6.h-6').classList.add('border-gray-500');
-                        circle.classList.remove('bg-purple-500');
-                        circle.classList.add('bg-transparent');
-                    }
-                });
-                
-                // Show corresponding info
-                if (method.querySelector('input').value === 'banking') {
-                    bankTransferInfo.classList.remove('hidden');
-                    momoInfo.classList.add('hidden');
-                } else {
-                    bankTransferInfo.classList.add('hidden');
-                    momoInfo.classList.remove('hidden');
-                }
-            });
-        });
-        
-        // Generate Seat Map
-        function generateSeatMap(maxSeats) {
-            seatMap.innerHTML = '';
-            const rows = ['A', 'B', 'C', 'D', 'E', 'F'];
-            const seatsPerRow = 10;
-            
-            rows.forEach(row => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex justify-center mb-2';
-                
-                for (let i = 1; i <= seatsPerRow; i++) {
-                    const seatId = `${row}${i}`;
-                    const seat = document.createElement('div');
-                    seat.className = 'seat w-8 h-8 m-1 rounded-sm flex items-center justify-center text-xs cursor-pointer transition';
-                    
-                    if (bookedSeats.includes(seatId)) {
-                        seat.className += ' bg-gray-800 border border-gray-600 cursor-not-allowed';
-                        seat.innerHTML = '<i class="fas fa-lock text-gray-600"></i>';
-                    } else {
-                        seat.className += ' bg-gray-600 hover:bg-gray-500';
-                        seat.textContent = seatId;
-                        
-                        seat.addEventListener('click', function() {
-                            toggleSeatSelection(seat, seatId, maxSeats);
-                        });
-                    }
-                    
-                    rowDiv.appendChild(seat);
-                }
-                
-                seatMap.appendChild(rowDiv);
-            });
-        }
-        
-        // Toggle Seat Selection
-        function toggleSeatSelection(seatElement, seatId, maxSeats) {
-            const index = selectedSeats.indexOf(seatId);
-            
-            if (index === -1) {
-                // Seat not selected yet
-                if (selectedSeats.length < maxSeats) {
-                    selectedSeats.push(seatId);
-                    seatElement.classList.remove('bg-gray-600', 'hover:bg-gray-500');
-                    seatElement.classList.add('bg-purple-600');
-                } else {
-                    // Show message that max seats reached
-                    alert(`Bạn chỉ có thể chọn tối đa ${maxSeats} ghế.`);
-                    return;
-                }
-            } else {
-                // Seat already selected - deselect it
-                selectedSeats.splice(index, 1);
-                seatElement.classList.remove('bg-purple-600');
-                seatElement.classList.add('bg-gray-600', 'hover:bg-gray-500');
-            }
-            
-            updateSelectedSeats();
-        }
-        
-        // Update Selected Seats Info
-        function updateSelectedSeats() {
-            selectedSeatsCount.textContent = selectedSeats.length;
-            
-            if (selectedSeats.length > 0) {
-                selectedSeatsInfo.classList.remove('hidden');
-                selectedSeatsList.textContent = selectedSeats.join(', ');
-                totalPrice.textContent = (selectedSeats.length * seatPrice).toLocaleString();
-                
-                // Enable/disable next button based on selected seats
-                const quantity = parseInt(document.getElementById('quantity').value);
-                nextToPaymentBtn.disabled = selectedSeats.length !== quantity;
-            } else {
-                selectedSeatsInfo.classList.add('hidden');
-                nextToPaymentBtn.disabled = true;
-            }
-        }
-        
-        // Simulate sending email confirmation
-        function simulateEmailConfirmation(bookingData) {
-            // In a real app, this would be done on the server side
-            console.log('Sending email confirmation to:', bookingData.email);
-            console.log('Email content:', {
-                subject: 'Xác nhận đặt vé Đêm Trăng Sáng',
-                body: `Xin chào ${bookingData.name},\n\nCảm ơn bạn đã đặt vé tham dự chương trình "Đêm Trăng Sáng".\n\nThông tin vé:\n- Số lượng: ${bookingData.quantity} vé\n- Ghế: ${bookingData.seats.join(', ')}\n- Tổng thanh toán: ${bookingData.total.toLocaleString()} VNĐ\n\nVé điện tử đã được đính kèm trong email này.\n\nTrân trọng,\nBan tổ chức Đêm Trăng Sáng`
-            });
-        }
-    });
-</script>
-<!-- Sponsors Section -->
-<section id="sponsors" class="py-16 moonlight-image-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fadeIn">Nhà Tài Trợ</h2>
-            <div class="w-20 h-1 bg-purple-600 mx-auto animate-slideInLeft"></div>
-            <p class="text-gray-300 max-w-2xl mx-auto mt-4 animate-fadeIn">Các nhà tài trợ sẽ ủng hộ bằng nhiều thức như hiện kim hoặc hiện vật theo mức mà chương trình đã đề ra quyền lợi của các nhà tài trợ</p>
-        </div>
-
-        <!-- Diamond Sponsors -->
-        <div class="mb-16 animate-fadeIn">
-            <h3 class="text-xl font-bold text-center mb-8 text-purple-400">
-                <i class="fas fa-gem mr-2"></i>Nhà Tài Trợ Kim Cương
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/200x100?text=Diamond+Sponsor+1" alt="Diamond Sponsor 1" class="h-16">
-                </div>
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/200x100?text=Diamond+Sponsor+2" alt="Diamond Sponsor 2" class="h-16">
-                </div>
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/200x100?text=Diamond+Sponsor+3" alt="Diamond Sponsor 3" class="h-16">
-                </div>
-            </div>
-        </div>
-
-        <!-- Gold Sponsors -->
-        <div class="mb-16 animate-fadeIn" style="animation-delay: 0.1s;">
-            <h3 class="text-xl font-bold text-center mb-8 text-yellow-400">
-                <i class="fas fa-medal mr-2"></i>Nhà Tài Trợ Vàng
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/150x80?text=Gold+Sponsor+1" alt="Gold Sponsor 1" class="h-12">
-                </div>
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/150x80?text=Gold+Sponsor+2" alt="Gold Sponsor 2" class="h-12">
-                </div>
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/150x80?text=Gold+Sponsor+3" alt="Gold Sponsor 3" class="h-12">
-                </div>
-                <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/150x80?text=Gold+Sponsor+4" alt="Gold Sponsor 4" class="h-12">
-                </div>
-            </div>
-        </div>
-
-        <!-- Silver Sponsors -->
-        <div class="animate-fadeIn" style="animation-delay: 0.2s;">
-            <h3 class="text-xl font-bold text-center mb-8 text-gray-300">
-                <i class="fas fa-award mr-2"></i>Nhà Tài Trợ Bạc
-            </h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg shadow-sm flex items-center justify-center hover-grow transition-all">
-                    <img src="https://via.placeholder.com/100x50?text=Silver+Sponsor" alt="Silver Sponsor" class="h-8">
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Bronze Sponsors (Nhà Tài Trợ Đồng) -->
-<div class="mb-16 animate-fadeIn moonlight-image-bg" style="animation-delay: 0.3s;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-xl font-bold text-center mb-8 text-amber-400">
-            <i class="fas fa-star mr-2"></i>Nhà Tài Trợ Đồng
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                <img src="https://via.placeholder.com/150x80?text=Bronze+Sponsor+1" alt="Bronze Sponsor 1" class="h-12">
-            </div>
-            <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                <img src="https://via.placeholder.com/150x80?text=Bronze+Sponsor+2" alt="Bronze Sponsor 2" class="h-12">
-            </div>
-            <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                <img src="https://via.placeholder.com/150x80?text=Bronze+Sponsor+3" alt="Bronze Sponsor 3" class="h-12">
-            </div>
-            <div class="bg-gray-800/50 p-6 rounded-lg shadow-md flex items-center justify-center hover-grow transition-all">
-                <img src="https://via.placeholder.com/150x80?text=Bronze+Sponsor+4" alt="Bronze Sponsor 4" class="h-12">
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- Map Section -->
 <section class="py-16 moonlight-image-bg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 animate-fadeIn">Địa Điểm Tổ Chức</h2>
-            <div class="w-20 h-1 bg-purple-600 mx-auto animate-slideInRight"></div>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 scroll-animate">Địa Điểm Tổ Chức</h2>
+            <div class="w-20 h-1 bg-purple-600 mx-auto scroll-animate"></div>
         </div>
         
-        <div class="bg-gray-800/50 rounded-lg overflow-hidden shadow-lg hover-grow transition-transform duration-500 animate-fadeIn">
+        <div class="bg-gray-800/50 rounded-lg overflow-hidden shadow-lg hover-grow transition-transform duration-500 scroll-animate">
             <!-- Container for image and info -->
             <div class="flex flex-col md:flex-row">
                 <!-- Image section - takes full width on mobile, half on desktop -->
                 <div class="w-full md:w-1/2 h-95">
-                    <img src="ảnh hội trường.jpg" alt="Địa điểm tổ chức" class="h-full w-full object-cover">
+                    <img src="ảnh hội trường 3.png" alt="Địa điểm tổ chức" class="h-full w-full object-cover">
                 </div>
                 
                 <!-- Info section - takes full width on mobile, half on desktop -->
                 <div class="w-full md:w-1/2 flex items-center justify-center p-8">
                     <div class="text-center md:text-left">
                         <div class="mb-6">
-                            <i class="fas fa-map-marker-alt text-4xl text-purple-400 mb-4"></i>
-                            <h3 class="text-2xl font-bold text-white mb-2">Hội trường tầng 4 (tòa Thư Viện) - Trường Đại học Ngoại Ngữ - Đại học Huế</h3>
-                            <p class="text-gray-300">57 Nguyễn Khoa Chiêm, Phường An Cựu, Quận Thuận Hóa, TP Huế</p>
+                            <i class="fas fa-map-marker-alt text-4xl text-purple-400 mb-4 scroll-animate"></i>
+                            <h3 class="text-2xl font-bold text-white mb-2 scroll-animate">Hội trường tầng 4 (tòa Thư Viện) - Trường Đại học Ngoại Ngữ - Đại học Huế</h3>
+                            <p class="text-gray-300 scroll-animate">57 Nguyễn Khoa Chiêm, Phường An Cựu, Quận Thuận Hóa, TP Huế</p>
                         </div>
                         
                         <!-- Additional info if needed -->
                         <div class="mt-6">
-                            <h4 class="text-lg font-semibold text-white mb-2">Thông tin thêm:</h4>
+                            <h4 class="text-lg font-semibold text-white mb-2 scroll-animate">Thông tin thêm:</h4>
                             <ul class="text-gray-300 space-y-2">
-                                <li class="flex items-start hover:text-purple-400 transition">
+                                <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                                     <i class="fas fa-clock text-purple-400 mt-1 mr-2"></i>
                                     <span>8:00 - 17:00, Thứ 2 - Thứ 6</span>
                                 </li>
-                                <li class="flex items-start hover:text-purple-400 transition">
+                                <li class="flex items-start hover:text-purple-400 transition scroll-animate">
                                     <i class="fas fa-phone-alt text-purple-400 mt-1 mr-2"></i>
                                     <span>0123 456 789</span>
                                 </li>
@@ -1407,7 +727,7 @@ confirmPaymentBtn.addEventListener('click', function() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <!-- Column 1 - Logo & Description -->
-            <div class="space-y-2 animate-fadeIn">
+            <div class="space-y-2 scroll-animate">
                 <h3 class="text-lg font-bold flex items-center">
                     <i class="fas fa-guitar text-xl text-purple-400 mr-2"></i>
                     <span>Guitar Concert</span>
@@ -1416,7 +736,7 @@ confirmPaymentBtn.addEventListener('click', function() {
             </div>
             
             <!-- Column 2 - Links -->
-            <div class="animate-fadeIn" style="animation-delay: 0.1s;">
+            <div class="scroll-animate">
                 <h3 class="text-base font-bold mb-2">Liên kết</h3>
                 <ul class="space-y-1.5">
                     <li><a href="#home" class="text-sm text-gray-400 hover:text-white transition">Trang chủ</a></li>
@@ -1426,7 +746,7 @@ confirmPaymentBtn.addEventListener('click', function() {
             </div>
             
             <!-- Column 3 - Clubs -->
-            <div class="animate-fadeIn" style="animation-delay: 0.2s;">
+            <div class="scroll-animate">
                 <h3 class="text-base font-bold mb-2">Câu lạc bộ</h3>
                 <ul class="space-y-1.5">
                     <li><a href="#" class="text-sm text-gray-400 hover:text-white transition">Guitar Khoa Học</a></li>
@@ -1436,7 +756,7 @@ confirmPaymentBtn.addEventListener('click', function() {
             </div>
             
             <!-- Column 4 - Contact -->
-            <div class="animate-fadeIn" style="animation-delay: 0.3s;">
+            <div class="scroll-animate">
                 <h3 class="text-base font-bold mb-2">Thông tin liên hệ:</h3>
                 <div class="flex space-x-3 mb-3">
                     <a href="#" class="bg-gray-800 hover:bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center transition">
@@ -1458,7 +778,7 @@ confirmPaymentBtn.addEventListener('click', function() {
         </div>
         
         <!-- Copyright -->
-        <div class="border-t border-gray-800 mt-8 pt-5 text-center text-sm text-gray-400 animate-fadeIn">
+        <div class="border-t border-gray-800 mt-8 pt-5 text-center text-sm text-gray-400 scroll-animate">
             <p>&copy; 2025 Guitar Concert: "Âm nhạc và thiện nguyện - Hòa chung một nhịp"</p>
         </div>
     </div>
@@ -1628,11 +948,14 @@ confirmPaymentBtn.addEventListener('click', function() {
                 "retina_detect": true
             });
         }
+
+        // Khởi tạo scroll animations
+        initScrollAnimations();
     });
 
     // Countdown timer
     function updateCountdown() {
-        const eventDate = new Date("Sep 27, 2025 13:05:00").getTime();
+        const eventDate = new Date("Sep 28, 2025 18:00:00").getTime();
         const now = new Date().getTime();
         const distance = eventDate - now;
         
@@ -1659,10 +982,23 @@ confirmPaymentBtn.addEventListener('click', function() {
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     
-    menuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-    
+  const menuIcon = document.getElementById('menu-icon');
+const menuText = document.getElementById('menu-text');
+
+menuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+
+    if (mobileMenu.classList.contains('hidden')) {
+        // Khi đóng menu
+        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+        menuText.textContent = "Menu";
+    } else {
+        // Khi mở menu
+        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+        menuText.textContent = "Close";
+    }
+});
+
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -1709,9 +1045,11 @@ confirmPaymentBtn.addEventListener('click', function() {
     const closeModalBtn = document.getElementById('close-modal');
     const ticketForm = document.getElementById('ticket-form');
     
-    buyTicketBtn.addEventListener('click', () => {
-        ticketModal.classList.remove('hidden');
-    });
+    if (buyTicketBtn) {
+        buyTicketBtn.addEventListener('click', () => {
+            ticketModal.classList.remove('hidden');
+        });
+    }
     
     closeModalBtn.addEventListener('click', () => {
         ticketModal.classList.add('hidden');
@@ -1743,22 +1081,83 @@ confirmPaymentBtn.addEventListener('click', function() {
     });
     
     // Scroll animation
-    const animateOnScroll = () => {
-        const elements = document.querySelectorAll('.animate-fadeIn, .animate-slideInLeft, .animate-slideInRight');
+    function initScrollAnimations() {
+        const scrollElements = document.querySelectorAll('.scroll-animate');
         
-        elements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect().top;
+        const elementInView = (el, dividend = 1) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return (
+                elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+            );
+        };
+        
+        const displayScrollElement = (element) => {
+            element.classList.add('animated');
+        };
+        
+        const hideScrollElement = (element) => {
+            element.classList.remove('animated');
+        };
+        
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el, 1.0)) {
+                    displayScrollElement(el);
+                } else {
+                    // Optional: hide elements when they're out of view
+                    // hideScrollElement(el);
+                }
+            });
+        };
+        
+        // Progress bar on scroll
+        const progressBar = document.getElementById('progress-bar');
+        const nav = document.getElementById('main-nav');
+        
+        window.addEventListener('scroll', () => {
             const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrolled = (scrollTop / (documentHeight - windowHeight)) * 100;
             
-            if (elementPosition < windowHeight - 100) {
-                element.style.opacity = '1';
-                element.style.transform = 'translateX(0)';
+            if (progressBar) {
+                progressBar.style.width = scrolled + '%';
             }
+            
+            // Change navbar style on scroll
+            if (nav) {
+                if (scrollTop > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            }
+            
+            handleScrollAnimation();
         });
-    };
+        
+        // Initial check on page load
+        handleScrollAnimation();
+    }
+
+    // Parallax effect
+    function initParallax() {
+        const parallaxElements = document.querySelectorAll('.parallax');
+        
+        window.addEventListener('scroll', () => {
+            let scrollPosition = window.pageYOffset;
+            
+            parallaxElements.forEach(element => {
+                const speed = 0.5;
+                element.style.transform = `translateY(${scrollPosition * speed}px)`;
+            });
+        });
+    }
     
-    window.addEventListener('scroll', animateOnScroll);
-    window.addEventListener('load', animateOnScroll);
+    // Initialize parallax if there are parallax elements
+    if (document.querySelectorAll('.parallax').length > 0) {
+        initParallax();
+    }
 </script>
 </body>
 </html>
